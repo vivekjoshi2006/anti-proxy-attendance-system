@@ -2,6 +2,11 @@
 <html lang="en">
 
 <head>
+    <script>
+        if (localStorage.getItem('auth_role') !== 'teacher') {
+            window.location.replace('/login.html');
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Attendance Portal</title>
@@ -502,10 +507,6 @@
     </div>
 
     <script>
-        if (localStorage.getItem('auth_role') !== 'teacher') {
-            window.location.href = '/login.html';
-        }
-
         function logout() {
             localStorage.clear();
             window.location.href = '/login.html';
@@ -917,4 +918,5 @@
         });
     </script>
 </body>
+
 </html>
