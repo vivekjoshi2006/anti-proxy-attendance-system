@@ -194,7 +194,7 @@ Make sure you have:
 ## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/vivekjoshi2006/Smart-Attendance-System.git
+git clone https://github.com/vivekjoshi2006/anti-proxy-attendance-system.git
 ```
 
 ---
