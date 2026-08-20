@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Attendance Portal</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Flatpickr Light -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- QR, Lucide, Charts & jsPDF -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body
+    class="min-h-screen relative selection:bg-indigo-500 selection:text-white bg-gradient-to-br from-indigo-50/40 via-purple-50/20 to-blue-50/40">
+
+    <!-- Floating Background Orbs -->
+    <div class="orb orb-indigo"></div>
+    <div class="orb orb-emerald"></div>
+    <div class="orb orb-amber"></div>
+
+    <div class="max-w-7xl mx-auto relative z-10 p-4 sm:p-6 lg:p-8 space-y-6">
+
+        <!-- Top Header Navigation -->
+        <header
+            class="glass-panel p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border border-indigo-200/70 shadow-lg shadow-indigo-500/5 bg-white/95">
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 p-0.5 shadow-lg shadow-indigo-500/20 flex-shrink-0">
+                    <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
+                        <i data-lucide="shield-check" class="w-7 h-7 text-indigo-600"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 id="dispCollege" class="text-[13px] font-black tracking-tight text-indigo-950 uppercase">
+                            National
+                            Institute of Technology</h1>
+                        <span
+                            class="px-2 py-0.5 rounded-md text-[13px] font-extrabold font-mono bg-indigo-50 text-indigo-700 border border-indigo-200">FACULTY
+                            PORTAL</span>
+                    </div>
+                    <p id="dispDept" class="text-[14px] font-bold text-indigo-600 flex items-center gap-1.5 mt-0.5">
+                        <i data-lucide="layers" class="w-3.5 h-3.5 inline"></i> Department of Computer Science &
+                        Engineering
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap items-center gap-2.5">
+                <button onclick="openClassModal()"
+                    class="px-3.5 py-2.5 text-[13px] font-bold rounded-xl bg-white hover:bg-indigo-50 border border-indigo-200 text-indigo-900 transition-all flex items-center gap-2 shadow-sm active:scale-95 cursor-pointer">
+                    <i data-lucide="book-open" class="w-4 h-4 text-indigo-600"></i> New Class
+                </button>
+                <button onclick="openStudentModal()"
+                    class="px-3.5 py-2.5 text-[13px] font-bold rounded-xl bg-white hover:bg-emerald-50 border border-emerald-200 text-emerald-900 transition-all flex items-center gap-2 shadow-sm active:scale-95 cursor-pointer">
+                    <i data-lucide="user-plus" class="w-4 h-4 text-emerald-600"></i> Add Student
+                </button>
+                <button onclick="openExportModal()"
+                    class="px-4 py-2.5 text-[13px] font-bold rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:opacity-95 text-white shadow-md shadow-rose-500/25 transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> Export PDF
+                </button>
+                <button onclick="logout()"
+                    class="px-3.5 py-2.5 text-[13px] font-bold rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Classes Bar -->
+        <div class="glass-panel p-3 flex items-center gap-3 overflow-x-auto border border-indigo-100/80 bg-white/90">
+            <span
+                class="text-[13px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-1.5 pl-2">
+                <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i> Classes:
+            </span>
+            <div id="classListPills" class="flex items-center gap-2"></div>
+        </div>
+
+        <!-- Active Class Banner & Calendar Picker -->
+        <div
+            class="glass-panel p-5 bg-gradient-to-r from-indigo-50/90 via-white/95 to-emerald-50/90 border border-indigo-100 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                <div>
+                    <div class="text-[13px] uppercase tracking-wider font-extrabold text-indigo-600">Active Live Lecture
+                    </div>
+                    <strong id="dispSubject" class="text-indigo-950 text-[13px] font-black block mt-0.5">CSE01:
+                        SDE</strong>
+                </div>
+                <button onclick="openEditClassModal()"
+                    class="p-2 bg-white hover:bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-200 shadow-sm transition-all cursor-pointer">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+
+            <div
+                class="flex flex-wrap items-center gap-3 bg-white/95 p-2 rounded-2xl border border-indigo-100 shadow-sm">
+                <span id="dispFaculty" class="text-indigo-900 font-bold text-[13px] flex items-center gap-1.5 px-2">
+                    <i data-lucide="user" class="w-4 h-4 text-amber-500"></i> Dr. AB
+                </span>
+                <div class="h-4 w-px bg-indigo-100"></div>
+                <div class="flex items-center gap-2 cursor-pointer px-2 py-1" onclick="openCalendarPicker()">
+                    <i data-lucide="calendar" class="w-4 h-4 text-indigo-600"></i>
+                    <span class="text-indigo-500 text-[13px] font-bold">Date:</span>
+                    <input type="text" id="attendanceDatePicker"
+                        class="bg-transparent border-0 text-[15px] text-indigo-600 font-mono font-bold outline-none cursor-pointer w-28 text-center"
+                        readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vibrant Glass Stat Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div
+                class="glass-panel p-5 bg-gradient-to-b from-indigo-50/80 to-white/95 border border-indigo-100 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-[13px] font-black text-indigo-700 uppercase tracking-widest">Total Enrolled</p>
+                    <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center"><i
+                            data-lucide="users" class="w-4 h-4"></i></div>
+                </div>
+                <p id="statTotal" class="text-2xl font-black text-indigo-950 mt-2 font-mono">0</p>
+                <p class="text-[13px] text-indigo-500 mt-1 font-semibold">Registered in Course</p>
+            </div>
+
+            <div
+                class="glass-panel p-5 bg-gradient-to-b from-emerald-50/80 to-white/95 border border-emerald-100 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-[13px] font-black text-emerald-700 uppercase tracking-widest">Present on Date</p>
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center"><i
+                            data-lucide="user-check" class="w-4 h-4"></i></div>
+                </div>
+                <p id="statPresent" class="text-2xl font-black text-emerald-600 mt-2 font-mono">0</p>
+                <p class="text-[13px] text-emerald-700/80 mt-1 font-semibold">Verified Attendance</p>
+            </div>
+
+            <div
+                class="glass-panel p-5 bg-gradient-to-b from-amber-50/80 to-white/95 border border-amber-100 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-[13px] font-black text-amber-700 uppercase tracking-widest">Late Arrivals</p>
+                    <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center"><i
+                            data-lucide="clock" class="w-4 h-4"></i></div>
+                </div>
+                <p id="statLate" class="text-2xl font-black text-amber-600 mt-2 font-mono">0</p>
+                <p class="text-[13px] text-amber-700/80 mt-1 font-semibold">Grace Window</p>
+            </div>
+
+            <div class="glass-panel p-5 bg-gradient-to-b from-rose-50/80 to-white/95 border border-rose-100 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-[13px] font-black text-rose-700 uppercase tracking-widest">Shortage (&lt;75%)</p>
+                    <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center"><i
+                            data-lucide="alert-triangle" class="w-4 h-4"></i></div>
+                </div>
+                <p id="statShortage" class="text-2xl font-black text-rose-600 mt-2 font-mono">0</p>
+                <p class="text-[13px] text-rose-700/80 mt-1 font-semibold">Attendance Alert</p>
+            </div>
+        </div>
+
+        <!-- QR on Left & Register Table on Right -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Anti-Proxy QR -->
+            <div class="lg:col-span-4 flex flex-col gap-4">
+                <div
+                    class="glass-panel p-6 flex flex-col items-center text-center border border-indigo-100 bg-white/95">
+                    <div class="flex items-center justify-between w-full mb-3">
+                        <span
+                            class="px-3 py-1 rounded-full text-[13px] font-extrabold bg-rose-50 text-rose-600 border border-rose-200 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span> Anti-Proxy QR
+                        </span>
+                        <div class="flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                            <i data-lucide="timer" class="w-3.5 h-3.5 text-amber-600"></i>
+                            <span id="timerCountdown" class="text-[13px] font-mono font-bold text-amber-700">30s</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="p-4 bg-white rounded-3xl shadow-xl shadow-indigo-500/10 border border-indigo-100 flex items-center justify-center my-2">
+                        <div id="qrcode"></div>
+                    </div>
+
+                    <div
+                        class="w-full bg-indigo-50 h-2 rounded-full mt-3 overflow-hidden border border-indigo-100 p-0.5">
+                        <div id="qrTimerBar"
+                            class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-full w-full rounded-full transition-all duration-1000 ease-linear">
+                        </div>
+                    </div>
+
+                    <h3 class="text-[13px] font-bold text-indigo-950 mt-3">Dynamic Token Refresh: 30s</h3>
+                    <p class="text-[13px] text-indigo-500">Scan via student mobile camera on Wi-Fi</p>
+                </div>
+            </div>
+
+            <!-- Attendance Register -->
+            <div class="lg:col-span-8">
+                <div class="glass-panel p-6 space-y-4 border border-indigo-100 bg-white/95">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-[14px] font-black text-indigo-950 flex items-center gap-2">
+                                <i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-500"></i>
+                                Attendance Roster: <span id="tableDateTitle" class="text-indigo-600 font-mono"></span>
+                            </h2>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="bulkMark('PRESENT')"
+                                class="px-3 py-1.5 text-[13px] font-bold rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-all flex items-center gap-1 active:scale-95 cursor-pointer">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i> All Present
+                            </button>
+                            <button onclick="bulkMark('ABSENT')"
+                                class="px-3 py-1.5 text-[13px] font-bold rounded-xl bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition-all flex items-center gap-1 active:scale-95 cursor-pointer">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i> All Absent
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search and Status Filters -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[13px]">
+                        <div class="relative flex-1">
+                            <i data-lucide="search" class="w-4 h-4 text-indigo-400 absolute left-3.5 top-3"></i>
+                            <input type="text" id="searchInput" oninput="filterRosterTable()"
+                                placeholder="Search by Roll No, Student Name..."
+                                class="w-full bg-indigo-50/30 border border-indigo-100 rounded-xl pl-10 pr-4 py-2 text-indigo-950 placeholder-indigo-300 outline-none focus:border-indigo-500 transition-all text-[13px]">
+                        </div>
+                        <div class="flex items-center gap-1 bg-indigo-50/50 p-1 rounded-xl border border-indigo-100">
+                            <button onclick="setStatusFilter('ALL')" id="filterBtnAll"
+                                class="px-3 py-1.5 rounded-lg font-bold text-[13px] text-white bg-indigo-600 shadow-sm cursor-pointer">All</button>
+                            <button onclick="setStatusFilter('PRESENT')" id="filterBtnPresent"
+                                class="px-3 py-1.5 rounded-lg font-bold text-[13px] text-indigo-700 hover:text-indigo-950 transition-all cursor-pointer">Present</button>
+                            <button onclick="setStatusFilter('ABSENT')" id="filterBtnAbsent"
+                                class="px-3 py-1.5 rounded-lg font-bold text-[13px] text-indigo-700 hover:text-indigo-950 transition-all cursor-pointer">Absent</button>
+                            <button onclick="setStatusFilter('SHORTAGE')" id="filterBtnShortage"
+                                class="px-3 py-1.5 rounded-lg font-bold text-[13px] text-indigo-700 hover:text-indigo-950 transition-all cursor-pointer">&lt;75%</button>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="overflow-x-auto rounded-2xl border border-indigo-100 bg-white">
+                        <table class="w-full text-left text-[13px]">
+                            <thead
+                                class="bg-indigo-50/60 text-indigo-700 uppercase border-b border-indigo-100 font-extrabold text-[13px] tracking-wider">
+                                <tr>
+                                    <th class="py-3 px-4">Roll No</th>
+                                    <th class="py-3 px-4">Student</th>
+                                    <th class="py-3 px-4">Cum. %</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4">Method</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rosterBody" class="divide-y divide-indigo-50/80 font-medium"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Attendance Trend Graph -->
+        <div class="glass-panel p-6 border border-indigo-100 bg-white/95">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3
+                        class="text-[13px] font-black text-indigo-950 uppercase tracking-widest flex items-center gap-2">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-emerald-500"></i>
+                        Attendance Trend Analysis
+                    </h3>
+                    <p class="text-[13px] text-indigo-500 font-medium mt-0.5">7-day lecture attendance projection</p>
+                </div>
+            </div>
+            <div class="h-64 w-full">
+                <canvas id="weeklyTrendChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- NEW CLASS MODAL -->
+    <div id="classModal"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-md w-full p-6 shadow-2xl space-y-4 border border-indigo-100 bg-white">
+            <div class="flex items-center justify-between pb-2 border-b border-indigo-100">
+                <h3 class="text-[15px] font-extrabold text-indigo-950">Launch New Lecture</h3>
+                <button onclick="closeClassModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x"
+                        class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="submitNewClass(event)" class="space-y-3.5 text-[13px]">
+                <div>
+                    <label class="block font-bold text-indigo-900 mb-1">Subject Name & Code</label>
+                    <input type="text" id="modalSubject" required placeholder="e.g. CSE01: SDE"
+                        class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-indigo-500 font-medium text-[13px]">
+                </div>
+                <div>
+                    <label class="block font-bold text-indigo-900 mb-1">Faculty Name</label>
+                    <input type="text" id="modalInstructor" required placeholder="e.g. Dr. AB"
+                        class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-indigo-500 font-medium text-[13px]">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-indigo-900 mb-1">Room / Lab</label>
+                        <input type="text" id="modalRoom" required placeholder="e.g. LH-102"
+                            class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-indigo-500 font-medium text-[13px]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-indigo-900 mb-1">Semester</label>
+                        <input type="text" id="modalSemester" placeholder="e.g. Semester 1"
+                            class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-indigo-500 font-medium text-[13px]">
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeClassModal()"
+                        class="flex-1 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold transition-all text-[13px]">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold shadow-md shadow-indigo-500/25 transition-all text-[13px]">Launch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT CLASS MODAL -->
+    <div id="editClassModal"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-md w-full p-6 shadow-2xl space-y-4 border border-indigo-100 bg-white">
+            <div class="flex items-center justify-between pb-2 border-b border-indigo-100">
+                <h3 class="text-[15px] font-extrabold text-indigo-950">Edit Class Details</h3>
+                <button onclick="closeEditClassModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x"
+                        class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="submitEditClass(event)" class="space-y-3.5 text-[13px]">
+                <input type="hidden" id="editSessionId">
+                <div>
+                    <label class="block font-bold text-indigo-900 mb-1">Subject Name & Code</label>
+                    <input type="text" id="editSubject" required
+                        class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-indigo-500 font-medium text-[13px]">
+                </div>
+                <div>
+                    <label class="block font-bold text-indigo-900 mb-1">Faculty Name</label>
+                    <input type="text" id="editInstructor" required
+                        class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-indigo-500 font-medium text-[13px]">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-indigo-900 mb-1">Room / Hall</label>
+                        <input type="text" id="editRoom" required
+                            class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-indigo-500 font-medium text-[13px]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-indigo-900 mb-1">Semester</label>
+                        <input type="text" id="editSemester"
+                            class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-indigo-500 font-medium text-[13px]">
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeEditClassModal()"
+                        class="flex-1 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold transition-all text-[13px]">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold shadow-md shadow-indigo-500/25 transition-all text-[13px]">Save
+                        Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD STUDENT MODAL -->
+    <div id="studentModal"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-md w-full p-6 shadow-2xl space-y-4 border border-emerald-100 bg-white">
+            <div class="flex items-center justify-between pb-2 border-b border-indigo-100">
+                <h3 class="text-[15px] font-extrabold text-indigo-950">Register Student</h3>
+                <button onclick="closeStudentModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x"
+                        class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="submitNewStudent(event)" class="space-y-3.5 text-[13px]">
+                <div>
+                    <label class="block font-bold text-indigo-900 mb-1">Roll Number</label>
+                    <input type="text" id="modalRollNo" required placeholder="e.g. 03CSE"
+                        class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2 text-indigo-950 uppercase font-mono font-bold outline-none focus:border-emerald-500 text-[13px]">
+                </div>
+                <div>
+                    <label class="block font-bold text-indigo-900 mb-1">Full Name</label>
+                    <input type="text" id="modalName" required placeholder="e.g. Rohan Verma"
+                        class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-emerald-500 font-medium text-[13px]">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-indigo-900 mb-1">Branch</label>
+                        <input type="text" id="modalBranch" required placeholder="e.g. CSE"
+                            class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-emerald-500 font-medium uppercase text-[13px]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-indigo-900 mb-1">Section</label>
+                        <input type="text" id="modalSection" placeholder="e.g. A"
+                            class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-emerald-500 font-medium uppercase text-[13px]">
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeStudentModal()"
+                        class="flex-1 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold transition-all text-[13px]">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold shadow-md shadow-emerald-500/25 transition-all text-[13px]">Add
+                        Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT STUDENT MODAL -->
+    <div id="editStudentModal"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-md w-full p-6 shadow-2xl space-y-4 border border-emerald-100 bg-white">
+            <div class="flex items-center justify-between pb-2 border-b border-indigo-100">
+                <h3 class="text-[15px] font-extrabold text-indigo-950">Edit Student Details</h3>
+                <button onclick="closeEditStudentModal()" class="text-indigo-400 hover:text-indigo-600"><i
+                        data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="submitEditStudent(event)" class="space-y-3.5 text-[13px]">
+                <input type="hidden" id="editStudentId">
+                <div>
+                    <label class="block font-bold text-indigo-900 mb-1">Roll Number</label>
+                    <input type="text" id="editRollNo" required
+                        class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2 text-indigo-950 uppercase font-mono font-bold outline-none focus:border-emerald-500 text-[13px]">
+                </div>
+                <div>
+                    <label class="block font-bold text-indigo-900 mb-1">Full Name</label>
+                    <input type="text" id="editName" required
+                        class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-emerald-500 font-medium text-[13px]">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-indigo-900 mb-1">Branch</label>
+                        <input type="text" id="editBranch" required
+                            class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-emerald-500 font-medium uppercase text-[13px]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-indigo-900 mb-1">Section</label>
+                        <input type="text" id="editSection"
+                            class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2 text-indigo-950 outline-none focus:border-emerald-500 font-medium uppercase text-[13px]">
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeEditStudentModal()"
+                        class="flex-1 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold transition-all text-[13px]">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold shadow-md shadow-emerald-500/25 transition-all text-[13px]">Save
+                        Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EXPORT PDF MODAL -->
+    <div id="exportModal"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-sm w-full p-6 shadow-2xl space-y-4 border border-rose-100 bg-white">
+            <div class="text-center space-y-1">
+                <div
+                    class="w-12 h-12 mx-auto rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-200 shadow-sm">
+                    <i data-lucide="file-down" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-[14px] font-black text-indigo-950">Generate Official PDF</h3>
+                <p class="text-[14px] font-black text-indigo-500 font-medium">Export audited register report</p>
+            </div>
+
+            <div class="p-3.5 bg-indigo-50/50 rounded-2xl border border-indigo-100 space-y-2">
+                <label class="text-[15px] font-bold text-indigo-900 uppercase tracking-wider block">Select Register
+                    Date:</label>
+                <input type="text" id="pdfDatePicker"
+                    class="w-full bg-white border border-indigo-200 rounded-xl px-3 py-2 text-[14px] text-indigo-600 font-mono font-bold outline-none cursor-pointer text-center"
+                    readonly>
+                <button onclick="downloadPDFReport('date')"
+                    class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[13px] flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Download Date Report
+                </button>
+            </div>
+
+            <button onclick="downloadPDFReport('master')"
+                class="w-full py-2.5 px-3.5 rounded-xl bg-white hover:bg-indigo-50 border border-indigo-200 text-indigo-900 font-bold text-[13px] flex items-center justify-between shadow-sm active:scale-95 transition-all cursor-pointer">
+                <span>Export Master Audit (All Dates)</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-indigo-600"></i>
+            </button>
+
+            <button onclick="closeExportModal()"
+                class="w-full text-center text-[15px] font-semibold text-indigo-400 hover:text-indigo-600 pt-1 cursor-pointer">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        if (localStorage.getItem('auth_role') !== 'teacher') {
+            window.location.href = '/login.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+
+        let currentSession = null;
+        let allSessions = [];
+        let rosterData = [];
+        let activeStatusFilter = 'ALL';
+        let qrCountdown = 30;
+        let trendChart = null;
+        let calendarPickerInstance = null;
+        let pdfCalendarInstance = null;
+        let chosenPDFDateISO = "";
+        let serverLANBase = "";
+
+        function initCalendar() {
+            calendarPickerInstance = flatpickr("#attendanceDatePicker", {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d M Y",
+                theme: "material_blue",
+                defaultDate: "today",
+                disableMobile: true,
+                onChange: async function (dates, dateStr) {
+                    if (dateStr) await changeAttendanceDate(dateStr);
+                }
+            });
+        }
+
+        function openCalendarPicker() {
+            if (calendarPickerInstance) calendarPickerInstance.open();
+        }
+
+        function initCharts() {
+            const ctxTrend = document.getElementById('weeklyTrendChart').getContext('2d');
+            const gradient = ctxTrend.createLinearGradient(0, 0, 0, 240);
+            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.25)');
+            gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+            trendChart = new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: [],
+                        borderColor: '#4f46e5',
+                        borderWidth: 3,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#6366f1',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { max: 100, min: 0, grid: { color: 'rgba(99, 102, 241, 0.08)' }, ticks: { color: '#6366f1', font: { size: 10, weight: '600' } } },
+                        x: { grid: { display: false }, ticks: { color: '#6366f1', font: { size: 10, weight: '600' } } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        async function loadRegister() {
+            try {
+                const res = await fetch('/api/roster');
+                const data = await res.json();
+                currentSession = data.session;
+                allSessions = data.sessions || [];
+                rosterData = data.students;
+                serverLANBase = data.lanBaseUrl || window.location.origin;
+
+                document.getElementById('dispCollege').innerText = currentSession.college;
+                document.getElementById('dispDept').innerText = currentSession.department;
+                document.getElementById('dispSubject').innerText = currentSession.subject;
+                document.getElementById('dispFaculty').innerHTML = `<i data-lucide="user" class="w-4 h-4 text-amber-500 inline mr-1"></i>${currentSession.instructor}`;
+                document.getElementById('tableDateTitle').innerText = currentSession.dateDisplay;
+
+                renderClassPills(allSessions, currentSession.sessionId);
+
+                if (calendarPickerInstance && currentSession.dateISO) {
+                    calendarPickerInstance.setDate(currentSession.dateISO, false);
+                }
+
+                const token = data.dynamicToken || "VALID_TOKEN";
+                const baseHost = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+                    ? serverLANBase
+                    : window.location.origin;
+
+                const directUrl = `${baseHost}/checkin.html?s=${encodeURIComponent(currentSession.sessionId)}&sub=${encodeURIComponent(currentSession.subject)}&fac=${encodeURIComponent(currentSession.instructor)}&date=${encodeURIComponent(currentSession.dateDisplay)}&t=${token}`;
+
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = "";
+                new QRCode(qrContainer, {
+                    text: directUrl,
+                    width: 160,
+                    height: 160,
+                    colorDark: "#312e81",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+
+                filterRosterTable();
+
+                if (trendChart && data.trends) {
+                    trendChart.data.labels = data.trends.labels;
+                    trendChart.data.datasets[0].data = data.trends.data;
+                    trendChart.update();
+                }
+
+                lucide.createIcons();
+            } catch (err) { console.error(err); }
+        }
+
+        function renderClassPills(sessionsList, activeId) {
+            const container = document.getElementById('classListPills');
+            container.innerHTML = sessionsList.map(s => {
+                const isActive = s.sessionId === activeId;
+                return `
+                    <button onclick="switchSession('${s.sessionId}')" class="px-3.5 py-1.5 text-[13px] rounded-xl font-extrabold transition-all cursor-pointer ${isActive
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
+                        : 'bg-white text-indigo-900 border border-indigo-100 hover:bg-indigo-50'
+                    }">
+                        ${s.subject.split(':')[0]} <span class="text-[13px] font-medium opacity-80">(${s.room})</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        async function switchSession(sessionId) {
+            await fetch('/api/sessions/switch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId })
+            });
+            qrCountdown = 30;
+            loadRegister();
+        }
+
+        function filterRosterTable() {
+            const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+            let present = 0, late = 0, absent = 0, shortageCount = 0;
+
+            const tbody = document.getElementById('rosterBody');
+            const filtered = rosterData.filter(s => {
+                const status = s.status || 'ABSENT';
+                if (status === 'PRESENT') present++;
+                else if (status === 'LATE') late++;
+                else absent++;
+
+                if (s.isShortage) shortageCount++;
+
+                const matchSearch = s.name.toLowerCase().includes(query) ||
+                    s.rollNo.toLowerCase().includes(query) ||
+                    s.branch.toLowerCase().includes(query);
+
+                let matchStatus = true;
+                if (activeStatusFilter === 'PRESENT') matchStatus = (status === 'PRESENT');
+                else if (activeStatusFilter === 'ABSENT') matchStatus = (status === 'ABSENT');
+                else if (activeStatusFilter === 'SHORTAGE') matchStatus = s.isShortage;
+
+                return matchSearch && matchStatus;
+            });
+
+            document.getElementById('statTotal').innerText = rosterData.length;
+            document.getElementById('statPresent').innerText = present;
+            document.getElementById('statLate').innerText = late;
+            document.getElementById('statShortage').innerText = shortageCount;
+
+            tbody.innerHTML = filtered.map(s => {
+                const status = s.status || 'ABSENT';
+                let badge = `<span class="px-2.5 py-1 rounded-lg text-[13px] font-extrabold bg-rose-50 text-rose-600 border border-rose-200 inline-block">ABSENT</span>`;
+                if (status === 'PRESENT') {
+                    badge = `<span class="px-2.5 py-1 rounded-lg text-[13px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">PRESENT</span>`;
+                } else if (status === 'LATE') {
+                    badge = `<span class="px-2.5 py-1 rounded-lg text-[13px] font-extrabold bg-amber-50 text-amber-700 border border-amber-200 inline-block">LATE</span>`;
+                }
+
+                const percent = s.cumulativePercent !== undefined ? s.cumulativePercent : 100;
+                const shortageBadge = s.isShortage
+                    ? `<span class="inline-flex items-center gap-1 font-extrabold text-rose-600 font-mono text-[15px]"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> ${percent}%</span>`
+                    : `<span class="font-extrabold text-emerald-600 font-mono text-[15px]">${percent}%</span>`;
+
+                const methodBadge = `<span class="px-2.5 py-1 rounded-lg text-[14px] font-bold bg-indigo-50/70 text-indigo-700 border border-indigo-100 inline-block">${s.method || 'Manually'}</span>`;
+
+                return `
+                    <tr class="hover:bg-indigo-50/40 transition-all">
+                        <td class="py-3 px-4 font-mono font-bold text-indigo-700 text-[15px]">${s.rollNo}</td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-2.5">
+                                <img src="${s.avatar}" class="w-[26px] h-[26px] rounded-full border border-indigo-200 bg-white object-cover shadow-sm">
+                                <span class="font-bold text-indigo-950 text-[15px]">${s.name}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">${shortageBadge}</td>
+                        <td class="py-3 px-4">${badge}</td>
+                        <td class="py-3 px-4 font-mono text-[14px]">${methodBadge}</td>
+                        <td class="py-3 px-4 text-right">
+                            <div class="inline-flex items-center gap-1">
+                                <button onclick="setManualStatus('${s.id}', 'PRESENT')" title="Present" class="px-2 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-extrabold text-[14px] transition-all cursor-pointer">P</button>
+                                <button onclick="setManualStatus('${s.id}', 'LATE')" title="Late" class="px-2 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 font-extrabold text-[14px] transition-all cursor-pointer">L</button>
+                                <button onclick="setManualStatus('${s.id}', 'ABSENT')" title="Absent" class="px-2 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 font-extrabold text-[14px] transition-all cursor-pointer">A</button>
+                                <button onclick="openEditStudentModal('${s.id}', '${s.name}', '${s.rollNo}', '${s.branch}', '${s.section}')" title="Edit" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-600 rounded-lg ml-1 cursor-pointer"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="deleteStudent('${s.id}', '${s.name}')" title="Delete" class="p-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-lg cursor-pointer"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function setStatusFilter(filter) {
+            activeStatusFilter = filter;
+            ['All', 'Present', 'Absent', 'Shortage'].forEach(f => {
+                const btn = document.getElementById(`filterBtn${f}`);
+                if (btn) {
+                    btn.className = (f.toUpperCase() === filter)
+                        ? 'px-3 py-1.5 rounded-lg font-bold text-[13px] text-white bg-indigo-600 shadow-sm cursor-pointer'
+                        : 'px-3 py-1.5 rounded-lg font-bold text-[13px] text-indigo-700 hover:text-indigo-950 transition-all cursor-pointer';
+                }
+            });
+            filterRosterTable();
+        }
+
+        async function changeAttendanceDate(dateISO) {
+            const res = await fetch('/api/session/set-date', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dateISO })
+            });
+            loadRegister();
+        }
+
+        function startQRRotationTimer() {
+            setInterval(() => {
+                qrCountdown--;
+                if (qrCountdown <= 0) {
+                    qrCountdown = 30;
+                    loadRegister();
+                }
+                document.getElementById('timerCountdown').innerText = `${qrCountdown}s`;
+                document.getElementById('qrTimerBar').style.width = `${(qrCountdown / 30) * 100}%`;
+            }, 1000);
+        }
+
+        async function setManualStatus(studentId, status) {
+            await fetch('/api/attendance/manual', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId, status })
+            });
+            loadRegister();
+        }
+
+        async function bulkMark(status) {
+            await fetch('/api/attendance/bulk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            loadRegister();
+        }
+
+        async function deleteStudent(id, name) {
+            if (!confirm(`Are you sure you want to remove ${name}?`)) return;
+            const res = await fetch(`/api/students/${id}`, { method: 'DELETE' });
+            if (res.ok) loadRegister();
+        }
+
+        function openClassModal() { document.getElementById('classModal').classList.remove('hidden'); }
+        function closeClassModal() { document.getElementById('classModal').classList.add('hidden'); }
+
+        async function submitNewClass(e) {
+            e.preventDefault();
+            const res = await fetch('/api/session/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    subject: document.getElementById('modalSubject').value.trim(),
+                    instructor: document.getElementById('modalInstructor').value.trim(),
+                    room: document.getElementById('modalRoom').value.trim(),
+                    semester: document.getElementById('modalSemester').value.trim()
+                })
+            });
+            closeClassModal();
+            loadRegister();
+        }
+
+        function openEditClassModal() {
+            if (!currentSession) return;
+            document.getElementById('editSessionId').value = currentSession.sessionId;
+            document.getElementById('editSubject').value = currentSession.subject;
+            document.getElementById('editInstructor').value = currentSession.instructor;
+            document.getElementById('editRoom').value = currentSession.room;
+            document.getElementById('editSemester').value = currentSession.semester;
+            document.getElementById('editClassModal').classList.remove('hidden');
+        }
+        function closeEditClassModal() { document.getElementById('editClassModal').classList.add('hidden'); }
+
+        async function submitEditClass(e) {
+            e.preventDefault();
+            await fetch('/api/session/edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId: document.getElementById('editSessionId').value,
+                    subject: document.getElementById('editSubject').value.trim(),
+                    instructor: document.getElementById('editInstructor').value.trim(),
+                    room: document.getElementById('editRoom').value.trim(),
+                    semester: document.getElementById('editSemester').value.trim()
+                })
+            });
+            closeEditClassModal();
+            loadRegister();
+        }
+
+        function openStudentModal() { document.getElementById('studentModal').classList.remove('hidden'); }
+        function closeStudentModal() { document.getElementById('studentModal').classList.add('hidden'); }
+
+        async function submitNewStudent(e) {
+            e.preventDefault();
+            await fetch('/api/students/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    rollNo: document.getElementById('modalRollNo').value.trim(),
+                    name: document.getElementById('modalName').value.trim(),
+                    branch: document.getElementById('modalBranch').value.trim(),
+                    section: document.getElementById('modalSection').value || 'A'
+                })
+            });
+            document.getElementById('modalRollNo').value = '';
+            document.getElementById('modalName').value = '';
+            closeStudentModal();
+            loadRegister();
+        }
+
+        function openEditStudentModal(id, name, rollNo, branch, section) {
+            document.getElementById('editStudentId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editRollNo').value = rollNo;
+            document.getElementById('editBranch').value = branch;
+            document.getElementById('editSection').value = section;
+            document.getElementById('editStudentModal').classList.remove('hidden');
+        }
+        function closeEditStudentModal() { document.getElementById('editStudentModal').classList.add('hidden'); }
+
+        async function submitEditStudent(e) {
+            e.preventDefault();
+            await fetch('/api/students/edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    studentId: document.getElementById('editStudentId').value,
+                    name: document.getElementById('editName').value.trim(),
+                    rollNo: document.getElementById('editRollNo').value.trim(),
+                    branch: document.getElementById('editBranch').value.trim(),
+                    section: document.getElementById('editSection').value.trim()
+                })
+            });
+            closeEditStudentModal();
+            loadRegister();
+        }
+
+        function openExportModal() {
+            document.getElementById('exportModal').classList.remove('hidden');
+            chosenPDFDateISO = currentSession ? currentSession.dateISO : new Date().toISOString().split('T')[0];
+
+            if (!pdfCalendarInstance) {
+                pdfCalendarInstance = flatpickr("#pdfDatePicker", {
+                    dateFormat: "Y-m-d",
+                    altInput: true,
+                    altFormat: "d M Y",
+                    theme: "material_blue",
+                    defaultDate: chosenPDFDateISO,
+                    disableMobile: true,
+                    onChange: (dates, dateStr) => { chosenPDFDateISO = dateStr; }
+                });
+            } else {
+                pdfCalendarInstance.setDate(chosenPDFDateISO, false);
+            }
+            lucide.createIcons();
+        }
+
+        function closeExportModal() { document.getElementById('exportModal').classList.add('hidden'); }
+
+        // ================= PDF EXPORT TRIGGER =================
+        function downloadPDFReport(mode) {
+            const targetDateISO = mode === 'date' ? (chosenPDFDateISO || currentSession.dateISO) : currentSession.dateISO;
+            if (typeof closeExportModal === 'function') closeExportModal();
+
+            window.open(`/report.html?dateISO=${targetDateISO}&mode=${mode}`, '_blank');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initCalendar();
+            initCharts();
+            loadRegister();
+            startQRRotationTimer();
+        });
+    </script>
+</body>
+</html>

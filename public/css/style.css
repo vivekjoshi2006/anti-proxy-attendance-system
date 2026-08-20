@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap');
+
+* {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background: radial-gradient(circle at 10% 10%, #eef2ff 0%, #f8fafc 45%, #ecfdf5 90%);
+    color: #0f172a;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ================= EYE-CATCHING FROSTED GLASS PANELS ================= */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 20px 45px -12px rgba(99, 102, 241, 0.12),
+                0 4px 12px -2px rgba(15, 23, 42, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+    border-radius: 1.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-interactive:hover {
+    background: rgba(255, 255, 255, 0.94);
+    transform: translateY(-3px);
+    box-shadow: 0 30px 60px -15px rgba(99, 102, 241, 0.2),
+                0 8px 20px -4px rgba(15, 23, 42, 0.06);
+    border-color: rgba(99, 102, 241, 0.35);
+}
+
+/* ================= AMBIENT DYNAMIC MESH GLOWS ================= */
+.glow-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(95px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.75;
+    animation: orbFloat 14s ease-in-out infinite alternate;
+}
+
+.glow-indigo {
+    top: -120px;
+    left: -100px;
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle, #818cf8 0%, rgba(99, 102, 241, 0) 70%);
+}
+
+.glow-emerald {
+    bottom: -120px;
+    right: -100px;
+    width: 560px;
+    height: 560px;
+    background: radial-gradient(circle, #34d399 0%, rgba(16, 185, 129, 0) 70%);
+    animation-delay: -5s;
+}
+
+.glow-amber {
+    top: 35%;
+    right: 10%;
+    width: 440px;
+    height: 440px;
+    background: radial-gradient(circle, #fcd34d 0%, rgba(245, 158, 11, 0) 70%);
+    animation-delay: -9s;
+}
+
+@keyframes orbFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(35px, -25px) scale(1.06); }
+    100% { transform: translate(-20px, 30px) scale(0.96); }
+}
+
+/* ================= MODERN INPUTS & CONTROLS ================= */
+.glass-input {
+    background: rgba(248, 250, 252, 0.85);
+    border: 1.5px solid rgba(226, 232, 240, 0.9);
+    border-radius: 1rem;
+    color: #0f172a;
+    transition: all 0.25s ease;
+}
+
+.glass-input:focus {
+    background: #ffffff;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12),
+                0 4px 12px rgba(99, 102, 241, 0.08);
+}
+
+/* ================= GLOWING GRADIENT BUTTONS ================= */
+.btn-gradient-primary {
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #06b6d4 100%);
+    color: #ffffff;
+    box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-gradient-primary:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 14px 30px -4px rgba(79, 70, 229, 0.5);
+    filter: brightness(1.06);
+}
+.btn-gradient-primary:active {
+    transform: translateY(0.5px);
+}
+
+.btn-gradient-success {
+    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #06b6d4 100%);
+    color: #ffffff;
+    box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.35), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: all 0.25s ease;
+}
+.btn-gradient-success:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 14px 30px -4px rgba(16, 185, 129, 0.45);
+    filter: brightness(1.05);
+}
+
+/* ================= FLATPICKR LIGHT GLASS THEME ================= */
+.flatpickr-calendar {
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(24px) !important;
+    border: 1.5px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.25) !important;
+    border-radius: 1.5rem !important;
+    padding: 14px !important;
+}
+
+.flatpickr-day.selected {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    border-color: transparent !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 8px 18px -3px rgba(79, 70, 229, 0.45) !important;
+}
+
+/* Success Pulse Ring Animation */
+@keyframes successPing {
+    0% { transform: scale(0.9); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-success-pop {
+    animation: successPing 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }

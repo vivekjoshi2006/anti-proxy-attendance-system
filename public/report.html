@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F0F5FF;
+            color: #1E1B4B;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .page-shadow {
+            box-shadow: 0 20px 35px -10px rgba(79, 70, 229, 0.12), 0 8px 18px -6px rgba(99, 102, 241, 0.08);
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print { display: none !important; }
+            .print-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border: none !important;
+                border-radius: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4 flex flex-col items-center justify-start">
+
+    <!-- Export Bar -->
+    <div class="no-print w-full max-w-4xl mb-6 flex flex-wrap items-center justify-between gap-4 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-indigo-200">
+        <div class="flex items-center space-x-3">
+            <div class="h-3.5 w-3.5 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span class="text-sm font-extrabold tracking-wider text-indigo-700 uppercase">Daily Attendance Audit Report</span>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="window.print()" class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white text-xs font-bold rounded-xl shadow-md transition-all transform hover:-translate-y-0.5 cursor-pointer">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H7a2 2 0 00-2 2v4h10z"></path>
+                </svg>
+                Print / Export PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN REPORT CONTAINER -->
+    <div class="print-container w-full max-w-4xl bg-white rounded-3xl p-8 sm:p-12 border border-indigo-100 page-shadow relative overflow-hidden">
+        
+        <!-- Glowing Orbs Background -->
+        <div class="absolute -top-12 -right-12 w-80 h-80 bg-gradient-to-bl from-blue-300/40 via-indigo-200/30 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-80 h-80 bg-gradient-to-tr from-amber-300/30 via-rose-200/30 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+
+        <!-- Dynamic Header -->
+        <header class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center pb-8 border-b border-indigo-100 gap-6">
+            <div>
+                <div class="inline-flex items-center space-x-2 px-3.5 py-1 bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 border border-indigo-200 rounded-full text-indigo-900 text-xs font-black tracking-wide uppercase mb-3 shadow-xs">
+                    <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                    <span>Certified Academic Audit</span>
+                </div>
+                <h1 id="collegeName" class="text-2xl sm:text-3xl font-black text-indigo-950 tracking-tight leading-tight">
+                    NATIONAL INSTITUTE OF TECHNOLOGY
+                </h1>
+                <p id="deptName" class="text-base font-extrabold text-blue-700 mt-1">
+                    Department of Computer Science & Engineering
+                </p>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-50/80 via-indigo-50/60 to-purple-50/80 border border-indigo-200 rounded-2xl p-4 text-right min-w-[210px] w-full sm:w-auto shadow-xs">
+                <div class="text-[13px] font-black text-indigo-900 uppercase tracking-wider mb-2">Audit Metadata</div>
+                <div class="text-xs space-y-1.5 font-semibold text-indigo-800">
+                    <div><span class="text-indigo-600">Date:</span> <span id="metaDate" class="font-extrabold text-indigo-950">-</span></div>
+                    <div><span class="text-indigo-600">Generated:</span> <span id="metaGenerated" class="font-extrabold text-indigo-950">-</span></div>
+                    <div><span class="text-indigo-600">Register Date:</span> <span id="metaRegDate" class="font-extrabold text-indigo-950">-</span></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 3-KPI Metrics -->
+        <section class="relative z-10 my-8 grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <!-- Metric 1: Total Enrolled -->
+            <div class="bg-gradient-to-br from-sky-100/70 via-blue-100/50 to-indigo-100/70 border border-blue-300 p-6 rounded-2xl flex flex-col justify-between shadow-xs">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-black uppercase tracking-wider text-blue-900">Total Enrolled</span>
+                    <span class="p-2 bg-white rounded-xl text-blue-600 shadow-xs border border-blue-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </span>
+                </div>
+                <div>
+                    <div id="statEnrolled" class="text-4xl font-black text-blue-950 tracking-tight">0</div>
+                    <div class="text-xs font-extrabold text-blue-800 mt-1">Students Registered</div>
+                </div>
+            </div>
+
+            <!-- Metric 2: Total Lectures -->
+            <div class="bg-gradient-to-br from-teal-100/70 via-emerald-100/50 to-cyan-100/70 border border-emerald-300 p-6 rounded-2xl flex flex-col justify-between shadow-xs">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-black uppercase tracking-wider text-emerald-900">Total Lectures</span>
+                    <span class="p-2 bg-white rounded-xl text-emerald-600 shadow-xs border border-emerald-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </span>
+                </div>
+                <div>
+                    <div id="statLectures" class="text-4xl font-black text-emerald-950 tracking-tight">0</div>
+                    <div class="text-xs font-extrabold text-emerald-800 mt-1">Session(s) Conducted</div>
+                </div>
+            </div>
+
+            <!-- Metric 3: Overall Attendance -->
+            <div id="statAttendanceCard" class="bg-gradient-to-br from-teal-100/70 via-emerald-100/50 to-cyan-100/70 border border-emerald-300 p-6 rounded-2xl flex flex-col justify-between shadow-xs">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-black uppercase tracking-wider text-emerald-900">Overall Attendance</span>
+                    <span class="p-2 bg-white rounded-xl text-emerald-600 shadow-xs border border-emerald-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </span>
+                </div>
+                <div>
+                    <div id="statAttendancePct" class="text-4xl font-black text-emerald-950 tracking-tight">0%</div>
+                    <div class="text-xs font-extrabold text-indigo-900 mt-1">Verified Audit Rate</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Lecture Container -->
+        <div id="lecturesContainer" class="relative z-10 space-y-8"></div>
+
+        <!-- Footer -->
+        <footer class="relative z-10 mt-12 pt-6 border-t border-indigo-100 flex flex-col sm:flex-row items-center justify-between text-sm text-indigo-700 gap-4">
+            <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                <span class="font-extrabold text-indigo-900">Smart Attendance Automation System • Official Certified Audit</span>
+            </div>
+            <div class="font-black text-indigo-500 uppercase tracking-widest text-[13px]">
+                Certified Report
+            </div>
+        </footer>
+    </div>
+
+    <!-- Auto-fetch and Render -->
+    <script>
+        async function loadReportData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dateISO = urlParams.get('dateISO') || '';
+            const mode = urlParams.get('mode') || 'date';
+            const isDateReport = (mode === 'date');
+
+            try {
+                const res = await fetch(`/api/export/summary?dateISO=${dateISO}&mode=${mode}`);
+                const data = await res.json();
+
+                // Populate Header Info
+                document.getElementById('collegeName').innerText = (data.college || "NATIONAL INSTITUTE OF TECHNOLOGY").toUpperCase();
+                document.getElementById('deptName').innerText = data.department || "Department of Computer Science & Engineering";
+                document.title = `${data.college || 'NIT'} - Attendance Audit (${data.selectedDateDisplay})`;
+
+                const nowTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                document.getElementById('metaDate').innerText = data.selectedDateDisplay || 'Today';
+                document.getElementById('metaGenerated').innerText = `${nowTime} (IST)`;
+                document.getElementById('metaRegDate').innerText = data.selectedDateDisplay || 'Today';
+
+                // Populate Stats
+                const totalLectures = data.classes ? data.classes.length : 0;
+                const attendanceRate = data.stats ? data.stats.overallAttendancePct : 0;
+                const enrolledCount = data.stats ? data.stats.totalStudents : (data.classes?.[0]?.roster?.length || 0);
+
+                document.getElementById('statEnrolled').innerText = enrolledCount;
+                document.getElementById('statLectures').innerText = totalLectures;
+                document.getElementById('statAttendancePct').innerText = `${attendanceRate}%`;
+
+                // Render Classes & Tables
+                const container = document.getElementById('lecturesContainer');
+                container.innerHTML = (data.classes || []).map((c, idx) => {
+                    const rows = (c.roster || []).map((s, i) => {
+                        const isPresent = (s.statusOnDate || '').toUpperCase() === 'PRESENT';
+                        const pct = parseInt(s.percentage || 0);
+                        const pctColor = pct >= 75 ? 'text-emerald-700' : (pct >= 60 ? 'text-amber-700' : 'text-rose-700');
+                        const rowBg = i % 2 === 1 ? 'bg-indigo-50/30' : 'bg-white';
+
+                        return `
+                        <tr class="hover:bg-blue-50/60 transition-colors ${rowBg}">
+                            <td class="py-3.5 px-4 text-center text-indigo-400 font-extrabold">${String(i + 1).padStart(2, '0')}</td>
+                            <td class="py-3.5 px-4 font-black text-indigo-900 mono">${s.rollNo || '-'}</td>
+                            <td class="py-3.5 px-4"><div class="font-black text-indigo-950">${s.name || '-'}</div></td>
+                            <td class="py-3.5 px-4">
+                                <span class="px-2.5 py-1 bg-indigo-100/80 text-indigo-900 border border-indigo-200 rounded-lg text-xs font-black">${s.branch || ''}-${s.section || ''}</span>
+                            </td>
+                            <td class="py-3.5 px-4 text-center">
+                                ${isPresent ? `
+                                <span class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-600 mr-1.5 animate-pulse"></span> PRESENT
+                                </span>` : `
+                                <span class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-300 shadow-xs">
+                                    <span class="w-2 h-2 rounded-full bg-rose-600 mr-1.5 animate-pulse"></span> ABSENT
+                                </span>`}
+                            </td>
+                            <td class="py-3.5 px-4 text-center text-xs font-bold text-indigo-900 mono">
+                                ${isDateReport ? (s.timeOnDate || 'N/A') : `${s.attended}/${s.total}`}
+                            </td>
+                            <td class="py-3.5 px-4 text-right font-black ${pctColor} mono">${s.percentage}%</td>
+                        </tr>
+                        `;
+                    }).join('');
+
+                    return `
+                    <section class="mb-8">
+                        <div class="bg-gradient-to-r from-blue-100/80 via-indigo-100/90 to-purple-100/80 border border-indigo-200 rounded-2xl p-5 sm:p-6 shadow-xs mb-4">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div class="flex items-start space-x-3.5">
+                                    <div class="p-2.5 bg-white border border-indigo-200 rounded-xl text-indigo-700 shadow-xs mt-0.5">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-black text-indigo-700 uppercase tracking-wider">Active Lecture Session</div>
+                                        <h2 class="text-base sm:text-lg font-black text-indigo-950 mt-0.5">Lecture ${idx + 1}: ${c.subject}</h2>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2.5 text-[12px]">
+                                    <div class="px-3.5 py-2 bg-white border border-indigo-200 rounded-xl text-indigo-900 shadow-sm"><span class="text-indigo-600 font-bold">Faculty:</span> <span class="font-extrabold text-indigo-950">${c.instructor || 'N/A'}</span></div>
+                                    <div class="px-3.5 py-2 bg-white border border-indigo-200 rounded-xl text-indigo-900 shadow-sm"><span class="text-indigo-600 font-bold">Room:</span> <span class="font-extrabold text-indigo-950">${c.room || 'N/A'}</span></div>
+                                    <div class="px-3.5 py-2 bg-white border border-indigo-200 rounded-xl text-indigo-900 shadow-sm"><span class="text-indigo-600 font-bold">Sem:</span> <span class="font-extrabold text-indigo-950">${c.semester || 'N/A'}</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto rounded-2xl border border-indigo-200 shadow-xs">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white uppercase tracking-wider font-extrabold">
+                                        <th class="py-4 px-4 text-center w-12">#</th>
+                                        <th class="py-4 px-4">Roll No</th>
+                                        <th class="py-4 px-4">Student Name</th>
+                                        <th class="py-4 px-4">Branch</th>
+                                        <th class="py-4 px-4 text-center">Status (${c.dateDisplay})</th>
+                                        <th class="py-4 px-4 text-center">${isDateReport ? 'Time' : 'Attended/Total'}</th>
+                                        <th class="py-4 px-4 text-right">Cum. %</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-indigo-100 text-sm font-bold">${rows}</tbody>
+                            </table>
+                        </div>
+                    </section>
+                    `;
+                }).join('');
+
+                // Auto Trigger Print dialog
+                setTimeout(() => {
+                    window.print();
+                }, 600);
+
+            } catch (err) {
+                console.error(err);
+                alert("Failed to load attendance report.");
+            }
+        }
+
+        window.onload = loadReportData;
+    </script>
+</body>
+</html>

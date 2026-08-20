@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Attendance Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="min-h-screen p-4 flex items-center justify-center relative bg-indigo-50/30 selection:bg-indigo-500 selection:text-white">
+
+    <!-- Floating Vibrant Ambient Glow Orbs -->
+    <div class="glow-orb glow-indigo"></div>
+    <div class="glow-orb glow-amber"></div>
+    <div class="glow-orb glow-emerald"></div>
+
+    <div class="max-w-md w-full relative z-10 space-y-4 my-auto">
+
+        <!-- College Header Badge -->
+        <div class="glass-panel p-6 text-center space-y-3 bg-white/80 border-indigo-100">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 p-0.5 shadow-lg shadow-indigo-500/25 flex items-center justify-center">
+                <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-7 h-7 text-indigo-600"></i>
+                </div>
+            </div>
+            <div>
+                <h1 class="text-[15px] font-black text-indigo-950 tracking-tight uppercase">National Institute of Technology</h1>
+                <p class="text-[15px] text-indigo-600 font-extrabold">Smart Attendance Portal</p>
+            </div>
+
+            <!-- Role Selector -->
+            <div class="flex bg-indigo-50/80 p-1 rounded-2xl border border-indigo-100 text-[13px] font-bold mt-2">
+                <button type="button" id="tabTeacher" onclick="switchRole('teacher')"
+                    class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white flex items-center justify-center gap-1.5 shadow-md shadow-indigo-500/25 cursor-pointer transition-all">
+                    <i data-lucide="graduation-cap" class="w-4 h-4"></i> Faculty Portal
+                </button>
+                <button type="button" id="tabStudent" onclick="switchRole('student')"
+                    class="flex-1 py-2.5 rounded-xl text-indigo-700 hover:text-indigo-950 flex items-center justify-center gap-1.5 cursor-pointer transition-all">
+                    <i data-lucide="user" class="w-4 h-4"></i> Student Portal
+                </button>
+            </div>
+        </div>
+
+        <!-- Login Card -->
+        <div class="glass-panel p-10 space-y- bg-white/80 border-indigo-100">
+            <form onsubmit="handleLogin(event)" class="space-y-4 text-[13px]">
+
+                <div>
+                    <label id="lblUsername" class="block font-extrabold text-indigo-900 mb-1.5">Faculty Email / Employee ID</label>
+                    <div class="relative">
+                        <i data-lucide="mail" id="iconUsername" class="w-4 h-4 text-indigo-400 absolute left-3.5 top-3.5"></i>
+                        <input type="text" id="loginUsername" required placeholder="e.g. faculty@edu"
+                            class="w-full glass-input pl-10 pr-3.5 py-3 text-indigo-950 font-semibold outline-none border-indigo-200 focus:border-indigo-500 bg-indigo-50/30">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-extrabold text-indigo-900 mb-1.5">Password</label>
+                    <div class="relative flex items-center">
+                        <i data-lucide="key-round" class="w-4 h-4 text-indigo-400 absolute left-3.5"></i>
+                        <input type="password" id="loginPassword" required placeholder="•••••"
+                            class="w-full glass-input pl-10 pr-10 py-3 text-indigo-950 font-semibold outline-none border-indigo-200 focus:border-indigo-500 bg-indigo-50/30">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3.5 text-indigo-400 hover:text-indigo-600 cursor-pointer">
+                            <i data-lucide="eye" id="eyeIcon" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnLogin" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-2xl font-black text-[13px] flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-lg shadow-indigo-500/25 transition-all">
+                    <i data-lucide="log-in" class="w-4 h-4"></i> Log In as Faculty
+                </button>
+
+                <div id="loginAlert" class="hidden p-3.5 rounded-xl text-[13px] font-bold text-center border"></div>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+    let currentRole = 'teacher';
+
+    function switchRole(role) {
+        currentRole = role;
+        const tabTeacher = document.getElementById('tabTeacher');
+        const tabStudent = document.getElementById('tabStudent');
+        const lblUser = document.getElementById('lblUsername');
+        const inputUser = document.getElementById('loginUsername');
+        const btnLogin = document.getElementById('btnLogin');
+
+        inputUser.value = '';
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('loginAlert').classList.add('hidden');
+        btnLogin.disabled = false;
+
+        if (role === 'teacher') {
+            tabTeacher.className = "flex-1 py-2.5 rounded-xl bg-indigo-600 text-white flex items-center justify-center gap-1.5 shadow-md shadow-indigo-500/25 cursor-pointer transition-all";
+            tabStudent.className = "flex-1 py-2.5 rounded-xl text-indigo-700 hover:text-indigo-950 flex items-center justify-center gap-1.5 cursor-pointer transition-all";
+            lblUser.innerText = "Faculty Email / Employee ID";
+            inputUser.placeholder = "e.g. faculty@edu";
+            btnLogin.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> Log In as Faculty`;
+        } else {
+            tabStudent.className = "flex-1 py-2.5 rounded-xl bg-emerald-600 text-white flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/25 cursor-pointer transition-all";
+            tabTeacher.className = "flex-1 py-2.5 rounded-xl text-indigo-700 hover:text-indigo-950 flex items-center justify-center gap-1.5 cursor-pointer transition-all";
+            lblUser.innerText = "Student Roll Number";
+            inputUser.placeholder = "e.g. 01CSE";
+            btnLogin.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> Log In as Student`;
+        }
+        lucide.createIcons();
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        const alertBox = document.getElementById('loginAlert');
+        const btn = document.getElementById('btnLogin');
+
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-1"></i> Authenticating...`;
+        if (window.lucide) lucide.createIcons();
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: currentRole, username, password })
+            });
+            const data = await res.json().catch(() => ({ success: false, message: `Server error` }));
+
+            if (data.success) {
+                alertBox.className = "p-3.5 rounded-2xl text-[13px] font-bold text-center border bg-emerald-50 text-emerald-700 border-emerald-200 flex items-center justify-center gap-1.5";
+                alertBox.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i> Success! Redirecting...`;
+                alertBox.classList.remove('hidden');
+
+                localStorage.setItem('auth_user', JSON.stringify(data.user));
+                localStorage.setItem('auth_role', data.role);
+
+                if (window.lucide) lucide.createIcons();
+
+                setTimeout(() => {
+                    window.location.href = data.redirectUrl || (data.role === 'teacher' ? '/index.html' : '/mark.html');
+                }, 600);
+            } else {
+                alertBox.className = "p-3.5 rounded-2xl text-[13px] font-bold text-center border bg-rose-50 text-rose-600 border-rose-200";
+                alertBox.innerText = data.message || "Invalid credentials.";
+                alertBox.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> Log In as ${currentRole === 'teacher' ? 'Faculty' : 'Student'}`;
+                lucide.createIcons();
+            }
+        } catch (err) {
+            alertBox.className = "p-3.5 rounded-2xl text-[13px] font-bold text-center border bg-rose-50 text-rose-600 border-rose-200";
+            alertBox.innerText = "Server connection error.";
+            alertBox.classList.remove('hidden');
+            btn.disabled = false;
+            btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> Log In as ${currentRole === 'teacher' ? 'Faculty' : 'Student'}`;
+            lucide.createIcons();
+        }
+    }
+
+    function togglePasswordVisibility() {
+        const pwdInput = document.getElementById('loginPassword');
+        const eyeBtn = document.getElementById('eyeIcon')?.closest('button');
+        if (pwdInput.type === 'password') {
+            pwdInput.type = 'text';
+            if (eyeBtn) eyeBtn.innerHTML = '<i data-lucide="eye-off" id="eyeIcon" class="w-4 h-4"></i>';
+        } else {
+            pwdInput.type = 'password';
+            if (eyeBtn) eyeBtn.innerHTML = '<i data-lucide="eye" id="eyeIcon" class="w-4 h-4"></i>';
+        }
+        lucide.createIcons();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+    </script>
+</body>
+</html>

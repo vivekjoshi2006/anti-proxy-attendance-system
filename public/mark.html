@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal | Smart Attendance</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Calendar Light Theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="min-h-screen relative p-4 sm:p-6 lg:p-8 selection:bg-indigo-500 selection:text-white bg-indigo-50/30">
+
+    <!-- Floating Vibrant Ambient Glow Orbs -->
+    <div class="glow-orb glow-indigo"></div>
+    <div class="glow-orb glow-emerald"></div>
+    <div class="glow-orb glow-amber"></div>
+
+    <div class="max-w-6xl mx-auto relative z-10 space-y-6">
+
+        <!-- TOP NAVBAR -->
+        <header class="glass-panel p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/80 border-indigo-100">
+            <div class="flex items-center gap-4">
+
+                <!-- Avatar with Status Ring -->
+                <div class="relative flex-shrink-0">
+                    <img id="stuAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=01CSE" alt="Avatar"
+                        class="w-14 h-14 rounded-2xl bg-white border-2 border-indigo-200 shadow-md shadow-indigo-500/10 object-cover">
+                    <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                    </span>
+                </div>
+
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-[15px] font-black tracking-tight text-indigo-950">
+                            Hey, <span id="dispStudentName" class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Aarav Sharma</span> 👋
+                        </h1>
+                        <span class="px-2 py-0.5 rounded-md text-[13px] font-black font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">ACTIVE STUDENT</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2.5 text-[15px] text-indigo-600/80 mt-1 font-semibold">
+                        <span id="dispStudentRoll" class="font-mono text-indigo-600 font-bold">01CSE</span>
+                        <span>•</span>
+                        <span id="dispBranchSection" class="text-indigo-700">CSE • Section A</span>
+                        <span>•</span>
+                        <span class="text-indigo-500">National Institute of Technology</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center gap-3">
+                <button onclick="logout()" class="px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 text-[13px] font-bold transition-all shadow-sm flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- STUDENT STATS BAR -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <!-- Overall Percentage -->
+            <div class="glass-panel p-5 bg-gradient-to-b from-indigo-50/80 to-white/90 border-indigo-100 relative overflow-hidden group">
+                <div class="flex items-center justify-between">
+                    <p class="text-[13px] font-extrabold text-indigo-600 uppercase tracking-widest">Attendance Score</p>
+                    <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                        <i data-lucide="percent" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <div class="flex items-baseline gap-1 mt-2">
+                    <span id="statScore" class="text-3xl font-black text-indigo-600 font-mono">100%</span>
+                </div>
+                <div class="w-full bg-indigo-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div id="statProgressBar" class="bg-indigo-600 h-full rounded-full transition-all duration-700" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Today's Status -->
+            <div class="glass-panel p-5 bg-gradient-to-b from-emerald-50/80 to-white/90 border-emerald-100 relative overflow-hidden group">
+                <div class="flex items-center justify-between">
+                    <p class="text-[13px] font-extrabold text-emerald-700 uppercase tracking-widest">Today's Check-In</p>
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                        <i data-lucide="calendar-check" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <p id="statTodayCheckin" class="text-2xl font-black text-emerald-600 mt-2 font-mono">PRESENT</p>
+                <p class="text-[13px] text-emerald-700/80 font-medium mt-1">Live verified on campus</p>
+            </div>
+
+            <!-- Safe Standing Indicator -->
+            <div class="glass-panel p-5 bg-gradient-to-b from-amber-50/80 to-white/90 border-amber-100 relative overflow-hidden group">
+                <div class="flex items-center justify-between">
+                    <p class="text-[13px] font-extrabold text-amber-700 uppercase tracking-widest">Academic Standing</p>
+                    <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                        <i data-lucide="shield" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <p id="statStanding" class="text-2xl font-black text-amber-700 mt-2">Good Standing</p>
+                <p class="text-[13px] text-amber-600/90 font-medium mt-1">No shortage risk (&ge;75%)</p>
+            </div>
+
+            <!-- Enrolled Classes -->
+            <div class="glass-panel p-5 bg-gradient-to-b from-sky-50/80 to-white/90 border-sky-100 relative overflow-hidden group">
+                <div class="flex items-center justify-between">
+                    <p class="text-[13px] font-extrabold text-sky-700 uppercase tracking-widest">Registered Lectures</p>
+                    <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center">
+                        <i data-lucide="book-marked" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <p id="statCourseCount" class="text-3xl font-black text-sky-700 mt-2 font-mono">1 Course</p>
+                <p class="text-[13px] text-sky-600/80 font-medium mt-1">Active semester modules</p>
+            </div>
+        </div>
+
+        <!-- MAIN WORKSPACE -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+
+            <!-- Instant Lecture Attendance Check-In Card -->
+            <div class="glass-panel p-6 sm:p-7 flex flex-col justify-between h-full space-y-5 bg-white/80 border-indigo-100">
+                <div class="space-y-4">
+
+                    <!-- Card Header -->
+                    <div class="flex items-center justify-between pb-3 border-b border-indigo-100">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+                                <i data-lucide="radio" class="w-4 h-4 animate-pulse"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-[14px] font-black text-indigo-950">Live Lecture Check-In</h2>
+                                <p class="text-[13px] text-indigo-500 font-medium">Verify your presence for current active lecture</p>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 text-[13px] font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> IN SESSION
+                        </span>
+                    </div>
+
+                    <!-- Lecture Selector -->
+                    <div class="space-y-1.5">
+                        <label class="text-[13px] font-extrabold text-indigo-900 flex items-center gap-1.5">
+                            <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i> Select Course / Subject
+                        </label>
+                        <select id="classSelect" onchange="handleClassChange()"
+                            class="w-full glass-input px-4 py-3 text-[13px] text-indigo-950 font-bold outline-none cursor-pointer border-indigo-200 focus:border-indigo-500 bg-indigo-50/30">
+                            <option value="">-- Choose Class --</option>
+                        </select>
+                    </div>
+
+                    <!-- Lecture Info Box -->
+                    <div class="grid grid-cols-2 gap-3 p-4 bg-gradient-to-r from-indigo-50/60 to-purple-50/40 rounded-2xl border border-indigo-100 text-[13px]">
+                        <div>
+                            <span class="text-[13px] font-extrabold text-indigo-400 uppercase tracking-wider block">Course Faculty</span>
+                            <strong id="dispFaculty" class="text-indigo-900 font-extrabold block mt-0.5">Dr. AB</strong>
+                        </div>
+                        <div>
+                            <span class="text-[13px] font-extrabold text-indigo-400 uppercase tracking-wider block">Lecture Hall / Room</span>
+                            <strong id="dispRoom" class="text-indigo-900 font-extrabold block mt-0.5">LH-102 (Lecture Hall)</strong>
+                        </div>
+                        <div class="pt-2 border-t border-indigo-100">
+                            <span class="text-[13px] font-extrabold text-indigo-400 uppercase tracking-wider block">Session Date</span>
+                            <strong id="dispDate" class="text-indigo-600 font-mono font-bold block mt-0.5">Today</strong>
+                        </div>
+                        <div class="pt-2 border-t border-indigo-100">
+                            <span class="text-[13px] font-extrabold text-indigo-400 uppercase tracking-wider block">Security Gate</span>
+                            <span class="text-emerald-600 font-bold flex items-center gap-1 mt-0.5">
+                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Anti-Proxy Active
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Button & Alert Area -->
+                <div class="space-y-3 pt-2">
+                    <button id="btnMark" onclick="submitAttendance()"
+                        class="w-full py-3.5 btn-gradient-success rounded-2xl font-black text-[13px] transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-[0.99] cursor-pointer">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 stroke-[2.5]"></i> Mark My Attendance Now
+                    </button>
+                    <div id="statusAlert" class="hidden p-3.5 rounded-2xl text-[13px] font-bold text-center border"></div>
+                </div>
+            </div>
+
+            <!-- Check Attendance History by Date Card -->
+            <div class="glass-panel p-6 sm:p-7 flex flex-col justify-between h-full space-y-5 bg-white/80 border-indigo-100">
+                <div class="space-y-4">
+                    <!-- Card Header -->
+                    <div class="flex items-center justify-between pb-3 border-b border-indigo-100">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold">
+                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-[14px] font-black text-indigo-950">Attendance by Date</h2>
+                                <p class="text-[13px] text-indigo-500 font-medium">Verify your multi-class logs</p>
+                            </div>
+                        </div>
+                        <span class="text-[13px] font-mono font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80">AUDIT LOG</span>
+                    </div>
+
+                    <!-- Date Selection Input & Presets -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[13px] font-extrabold text-indigo-900">Pick Date from Calendar</label>
+
+                            <!-- Quick-Pick Date Tags -->
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="setQuickDate('today')" class="text-[13px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-md border border-indigo-200 transition-all cursor-pointer">Today</button>
+                                <button type="button" onclick="setQuickDate('yesterday')" class="text-[13px] font-bold text-violet-600 hover:text-violet-800 bg-violet-50 hover:bg-violet-100 px-2 py-0.5 rounded-md border border-violet-200 transition-all cursor-pointer">Yesterday</button>
+                            </div>
+                        </div>
+                        <input type="text" id="studentDatePicker"
+                            class="w-full glass-input px-4 py-3 text-[13px] text-indigo-600 font-mono font-bold outline-none cursor-pointer text-center border-indigo-200 focus:border-indigo-500 bg-indigo-50/30"
+                            readonly>
+                    </div>
+
+                    <!-- Result List for Picked Date -->
+                    <div id="classesResultContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        <div class="p-4 bg-indigo-50/50 rounded-2xl border border-dashed border-indigo-200 text-center text-[13px] text-indigo-400">
+                            <i data-lucide="calendar-search" class="w-5 h-5 mx-auto mb-1 text-indigo-300"></i>
+                            Select a date and click below to view class records
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Action Button -->
+                <div class="pt-2">
+                    <button onclick="checkClassesByDate()"
+                        class="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-[13px] font-black rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 active:scale-[0.99] cursor-pointer">
+                        <i data-lucide="search" class="w-4 h-4 text-white"></i> View Records for Date
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // Authentication Guard
+        if (localStorage.getItem('auth_role') === 'teacher') {
+            window.location.href = '/index.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+
+        let deviceFingerprint = localStorage.getItem('smart_attendance_device_id') || 
+            ('DEV-' + Math.random().toString(36).substring(2, 10).toUpperCase());
+        localStorage.setItem('smart_attendance_device_id', deviceFingerprint);
+
+        let selectedDateISO = new Date().toISOString().split('T')[0];
+        let allSessionsList = [];
+        let loggedInUser = null;
+        let datePickerInstance = null;
+
+        function initStudentCalendar() {
+            datePickerInstance = flatpickr("#studentDatePicker", {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d M Y",
+                theme: "material_blue",
+                defaultDate: "today",
+                disableMobile: true,
+                onChange: (dates, dateStr) => { if (dateStr) selectedDateISO = dateStr; }
+            });
+        }
+
+        function setQuickDate(type) {
+            const d = new Date();
+            if (type === 'yesterday') {
+                d.setDate(d.getDate() - 1);
+            }
+            const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            selectedDateISO = iso;
+            if (datePickerInstance) {
+                datePickerInstance.setDate(iso, true);
+            }
+            checkClassesByDate();
+        }
+
+        async function loadSession() {
+            try {
+                // Read logged-in user profile
+                const authStr = localStorage.getItem('auth_user');
+                if (authStr) {
+                    loggedInUser = JSON.parse(authStr);
+                    document.getElementById('dispStudentName').innerText = loggedInUser.name || "Aarav Sharma";
+                    document.getElementById('dispStudentRoll').innerText = loggedInUser.rollNo || "01CSE";
+                    document.getElementById('dispBranchSection').innerText = `${loggedInUser.branch || 'CSE'} • Section ${loggedInUser.section || 'A'}`;
+                    if (loggedInUser.avatar) {
+                        document.getElementById('stuAvatar').src = loggedInUser.avatar;
+                    }
+                }
+
+                // Fetch Sessions and Active Ledger
+                const res = await fetch('/api/sessions');
+                const data = await res.json();
+                allSessionsList = data.sessions || [];
+
+                document.getElementById('statCourseCount').innerText = `${allSessionsList.length} Subject${allSessionsList.length > 1 ? 's' : ''}`;
+
+                const select = document.getElementById('classSelect');
+                select.innerHTML = '';
+                allSessionsList.forEach(s => {
+                    const isSelected = (s.sessionId === data.activeSessionId) ? 'selected' : '';
+                    select.innerHTML += `<option value="${s.sessionId}" ${isSelected}>${s.subject} (${s.room})</option>`;
+                });
+
+                handleClassChange();
+                await fetchStudentCumulativeStats();
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Failed to load session", err);
+            }
+        }
+
+        async function fetchStudentCumulativeStats() {
+            try {
+                const res = await fetch('/api/roster');
+                const data = await res.json();
+                const roll = loggedInUser ? loggedInUser.rollNo : '01CSE';
+                const found = (data.students || []).find(s => s.rollNo === roll);
+
+                if (found) {
+                    const pct = found.cumulativePercent !== undefined ? found.cumulativePercent : 100;
+                    document.getElementById('statScore').innerText = `${pct}%`;
+                    document.getElementById('statProgressBar').style.width = `${pct}%`;
+
+                    if (pct < 75) {
+                        document.getElementById('statStanding').innerText = "Shortage Warning";
+                        document.getElementById('statStanding').className = "text-2xl font-black text-rose-600 mt-2";
+                    } else {
+                        document.getElementById('statStanding').innerText = "Good Standing";
+                        document.getElementById('statStanding').className = "text-2xl font-black text-amber-700 mt-2";
+                    }
+
+                    const isP = found.status === 'PRESENT';
+                    document.getElementById('statTodayCheckin').innerText = found.status;
+                    document.getElementById('statTodayCheckin').className = isP
+                        ? "text-2xl font-black text-emerald-600 mt-2 font-mono"
+                        : "text-2xl font-black text-rose-600 mt-2 font-mono";
+                }
+            } catch(e) {}
+        }
+
+        function handleClassChange() {
+            const selectedId = document.getElementById('classSelect').value;
+            const found = allSessionsList.find(s => s.sessionId === selectedId);
+            if (found) {
+                document.getElementById('dispFaculty').innerText = found.instructor;
+                document.getElementById('dispRoom').innerText = found.room;
+                document.getElementById('dispDate').innerText = found.dateDisplay;
+            }
+        }
+
+        async function submitAttendance() {
+            const sessionId = document.getElementById('classSelect').value;
+            const alertBox = document.getElementById('statusAlert');
+            const btn = document.getElementById('btnMark');
+
+            if (!sessionId) {
+                alertBox.className = "p-4 rounded-2xl text-[13px] font-bold text-center border bg-rose-50 text-rose-600 border-rose-200";
+                alertBox.innerText = "Please select a Course first!";
+                alertBox.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Verifying Attendance...`;
+            if (window.lucide) lucide.createIcons();
+
+            try {
+                const res = await fetch('/api/attendance/qr-mark', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        studentId: loggedInUser ? loggedInUser.id : 'STU0',
+                        rollNo: loggedInUser ? loggedInUser.rollNo : '01CSE',
+                        sessionId,
+                        deviceId: deviceFingerprint
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alertBox.className = "p-4 rounded-2xl text-[13px] font-bold text-center border bg-emerald-50 text-emerald-700 border-emerald-200 space-y-1";
+                    alertBox.innerHTML = `
+                        <div class="text-[13px] font-black flex items-center justify-center gap-1.5 text-emerald-700">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i> Attendance Recorded!
+                        </div>
+                        <p class="text-[13px] text-emerald-600">${data.message} at ${data.time}</p>
+                    `;
+                    btn.classList.add('hidden');
+                    await fetchStudentCumulativeStats();
+                } else {
+                    alertBox.className = "p-4 rounded-2xl text-[13px] font-bold text-center border bg-rose-50 text-rose-600 border-rose-200";
+                    alertBox.innerText = data.message;
+                    btn.disabled = false;
+                    btn.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4"></i> Mark My Attendance Now`;
+                }
+                alertBox.classList.remove('hidden');
+            } catch (e) {
+                alertBox.className = "p-4 rounded-2xl text-[13px] font-bold text-center border bg-rose-50 text-rose-600 border-rose-200";
+                alertBox.innerText = "Failed to connect to campus server.";
+                alertBox.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4"></i> Mark My Attendance Now`;
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+
+        async function checkClassesByDate() {
+            const rollNo = loggedInUser ? loggedInUser.rollNo : '01CSE';
+            const container = document.getElementById('classesResultContainer');
+
+            container.innerHTML = `<p class="text-indigo-400 text-[13px] p-2 text-center">Fetching records...</p>`;
+
+            try {
+                const res = await fetch(`/api/student/classes-by-date?rollNo=${encodeURIComponent(rollNo)}&dateISO=${encodeURIComponent(selectedDateISO)}`);
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    container.innerHTML = `<p class="text-rose-600 text-[13px] font-bold p-2 text-center bg-rose-50 rounded-xl border border-rose-200">${data.message || 'No record found.'}</p>`;
+                    return;
+                }
+
+                let html = `<div class="text-[13px] font-extrabold text-indigo-700 pb-1">Attendance on ${data.dateDisplay}:</div>`;
+                data.classes.forEach(c => {
+                    const isPres = c.status === 'PRESENT';
+                    html += `
+                        <div class="p-3 bg-white/90 rounded-2xl border border-indigo-100 shadow-sm flex items-center justify-between text-[13px]">
+                            <div>
+                                <strong class="text-indigo-950 block font-bold text-[13px]">${c.subject}</strong>
+                                <span class="text-[13px] text-indigo-500">${c.instructor} • ${c.room}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-2.5 py-1 rounded-lg text-[13px] font-black ${isPres ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'}">
+                                    ${c.status}
+                                </span>
+                                ${c.time && c.time !== '—' ? `<span class="block text-[13px] text-indigo-400 font-mono mt-0.5">${c.time}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+                if (window.lucide) lucide.createIcons();
+            } catch (e) {
+                container.innerHTML = `<p class="text-rose-600 text-[13px] font-semibold p-2 text-center">Failed to load classes.</p>`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initStudentCalendar();
+            loadSession();
+        });
+    </script>
+</body>
+
+</html>
